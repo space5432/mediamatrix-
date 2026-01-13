@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEDIAMATRIX | SaaS UGC Platform</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        navy: {
+                            900: '#050a14', // Darker Deep Royal
+                            800: '#0f172a',
+                            700: '#1e293b',
+                        },
+                        brand: {
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        },
+                        royal: {
+                            950: '#020617',
+                            900: '#1e1b4b',
+                            800: '#312e81',
+                            700: '#4338ca',
+                            600: '#4f46e5',
+                            500: '#6366f1',
+                            400: '#818cf8',
+                        }
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'float-delayed': 'float 6s ease-in-out 3s infinite',
+                        'slide-up': 'slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'glow': 'glow 3s ease-in-out infinite alternate',
+                        'gradient-x': 'gradient-x 15s ease infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(30px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        glow: {
+                            '0%': { boxShadow: '0 0 20px rgba(59, 130, 246, 0.1)' },
+                            '100%': { boxShadow: '0 0 40px rgba(59, 130, 246, 0.4)' }
+                        },
+                        'gradient-x': {
+                            '0%, 100%': {
+                                'background-size': '200% 200%',
+                                'background-position': 'left center'
+                            },
+                            '50%': {
+                                'background-size': '200% 200%',
+                                'background-position': 'right center'
+                            },
+                        },
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .hide { display: none !important; }
+        .watermarked {
+            position: relative;
+            overflow: hidden;
+        }
+        .watermarked::after {
+            content: "PREVIEW ONLY • MEDIAMATRIX";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.5);
+            pointer-events: none;
+            z-index: 10;
+            white-space: nowrap;
+        }
+        
+        /* New Animations */
+        .fade-in { animation: fadeIn 0.8s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .slide-up-delay-1 { animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards; opacity: 0; }
+        .slide-up-delay-2 { animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards; opacity: 0; }
+        .slide-up-delay-3 { animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards; opacity: 0; }
+        
+        @keyframes slideUp {
+            from { transform: translateY(40px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Glassmorphism */
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glass-dark {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        /* Gradient Text */
+        .text-gradient {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-image: linear-gradient(135deg, #a5b4fc 0%, #6366f1 50%, #4338ca 100%);
+        }
+        
+        .text-gradient-light {
+             background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-image: linear-gradient(135deg, #e0e7ff 0%, #a5b4fc 50%, #818cf8 100%);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #312e81; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4f46e5; }
+        
+        .royal-glow {
+            box-shadow: 0 0 80px rgba(67, 56, 202, 0.2);
+        }
+        
+        .bg-mesh {
+            background-color: #020617;
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+                radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
+                radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-200 antialiased selection:bg-royal-500 selection:text-white overflow-x-hidden">
+
+    <!-- NAVIGATION -->
+    <nav class="fixed w-full z-50 glass transition-all duration-500">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-24 items-center">
+                <div class="flex items-center cursor-pointer group" onclick="app.router('home')">
+                    <div class="bg-gradient-to-br from-royal-700 to-indigo-500 text-white font-bold p-2.5 rounded-xl mr-3 shadow-lg shadow-royal-500/30 group-hover:scale-110 transition-transform duration-300">MM</div>
+                    <span class="font-bold text-2xl tracking-tight text-white group-hover:text-brand-400 transition-colors">MEDIAMATRIX</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-10 text-sm font-medium text-slate-300" id="public-nav">
+                    <a href="#" onclick="app.router('home')" class="hover:text-white transition-colors relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-brand-400 after:transition-all hover:after:w-full">Home</a>
+                    <a href="#how-it-works" class="hover:text-white transition-colors relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-brand-400 after:transition-all hover:after:w-full">How It Works</a>
+                    <a href="#" onclick="app.router('login')" class="text-white hover:text-brand-400 transition-colors font-semibold">Login</a>
+                    <button onclick="app.router('signup')" class="bg-gradient-to-r from-royal-600 to-indigo-600 hover:from-royal-500 hover:to-indigo-500 text-white px-8 py-3 rounded-full transition-all duration-300 shadow-[0_0_20px_rgba(79,70,229,0.3)] hover:shadow-[0_0_30px_rgba(79,70,229,0.6)] hover:-translate-y-1 font-bold">Get Started</button>
+                </div>
+                <div class="hidden flex items-center space-x-6" id="app-nav">
+                    <div class="flex items-center space-x-2 bg-slate-900/50 px-4 py-2 rounded-full border border-slate-700/50">
+                         <div class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+                         <span id="user-display" class="text-xs font-bold text-slate-300 uppercase tracking-wide"></span>
+                    </div>
+                    <button onclick="app.logout()" class="text-sm text-slate-400 hover:text-red-400 font-medium transition-colors"><i class="fa-solid fa-right-from-bracket mr-1"></i> Log Out</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="pt-16 min-h-screen relative">
+
+        <!-- ======================= 
+             LANDING PAGE 
+             ======================= -->
+        <section id="page-home" class="page-section fade-in">
+            <!-- Hero -->
+            <div class="relative bg-slate-950 pt-32 pb-40 overflow-hidden">
+                <!-- Animated Background Elements -->
+                <div class="absolute inset-0 z-0">
+                    <div class="absolute top-0 left-1/4 w-[500px] h-[500px] bg-royal-700 rounded-full mix-blend-screen filter blur-[100px] opacity-30 animate-float"></div>
+                    <div class="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-indigo-600 rounded-full mix-blend-screen filter blur-[100px] opacity-30 animate-float-delayed"></div>
+                    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full bg-slate-950/80 backdrop-blur-sm z-10"></div>
+                    <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 z-0"></div>
+                </div>
+
+                <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                    <span class="slide-up-delay-1 inline-block py-1.5 px-4 rounded-full bg-royal-900/40 border border-royal-500/30 backdrop-blur-md text-brand-400 text-xs font-bold tracking-widest uppercase mb-10 shadow-[0_0_20px_rgba(99,102,241,0.3)] animate-pulse-slow">
+                        <i class="fa-solid fa-bolt mr-2 text-brand-400"></i>The New Standard in Production
+                    </span>
+                    <h1 class="slide-up-delay-2 text-6xl md:text-8xl font-black text-white tracking-tighter mb-8 leading-tight">
+                        Affordable <span class="text-gradient-light relative inline-block">UGC Videos
+                        <svg class="absolute w-full h-3 -bottom-1 left-0 text-brand-500 opacity-60" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 5 Q 50 10 100 5" stroke="currentColor" stroke-width="3" fill="none" /></svg>
+                        </span> <br class="hidden md:block" /> for Fast-Moving Startups
+                    </h1>
+                    <p class="slide-up-delay-3 text-lg md:text-2xl text-slate-400 max-w-3xl mx-auto mb-8 font-light leading-relaxed">
+                        Real creators. Real content. <span class="text-slate-200 font-medium">No influencer premiums.</span> 
+                        We facilitate high-quality UGC production in a controlled, safe environment.
+                    </p>
+
+                    <!-- Simple Pricing Note -->
+                    <div class="slide-up-delay-3 mb-12">
+                        <span class="text-brand-300 font-medium text-lg bg-royal-900/50 px-6 py-2 rounded-full border border-royal-700/50">
+                            Starting from <span class="text-white font-bold">₹1000</span> to <span class="text-white font-bold">₹1500</span> per video
+                        </span>
+                    </div>
+
+                    <div class="slide-up-delay-3 flex flex-col sm:flex-row justify-center gap-6">
+                        <button onclick="app.preSelectRole('startup')" class="group relative px-10 py-5 rounded-2xl bg-gradient-to-r from-royal-600 to-indigo-600 text-white font-bold text-lg hover:from-royal-500 hover:to-indigo-500 transition-all duration-300 shadow-[0_0_40px_rgba(79,70,229,0.4)] hover:shadow-[0_0_60px_rgba(79,70,229,0.6)] hover:-translate-y-2 ring-1 ring-white/10 overflow-hidden">
+                            <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500 skew-y-12"></div>
+                            <span class="relative z-10 flex items-center">Get Started as a Startup <i class="fa-solid fa-arrow-right ml-3 group-hover:translate-x-1 transition-transform"></i></span>
+                        </button>
+                        <button onclick="app.preSelectRole('creator')" class="px-10 py-5 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 text-white font-bold text-lg hover:bg-white/10 hover:border-brand-400/50 transition-all duration-300 hover:-translate-y-2 shadow-lg">
+                            Join as a Creator
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Hero Bottom Fade -->
+                <div class="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent z-10"></div>
+            </div>
+
+            <!-- How It Works -->
+            <div id="how-it-works" class="py-32 bg-slate-950 relative overflow-hidden">
+                <!-- Decoration -->
+                <div class="absolute top-0 right-0 w-96 h-96 bg-royal-800 rounded-full mix-blend-screen filter blur-[120px] opacity-20 translate-x-1/2 -translate-y-1/2"></div>
+                <div class="absolute bottom-0 left-0 w-96 h-96 bg-indigo-800 rounded-full mix-blend-screen filter blur-[120px] opacity-20 -translate-x-1/2 translate-y-1/2"></div>
+
+                <div class="max-w-7xl mx-auto px-4 relative z-10">
+                    <div class="text-center mb-24">
+                        <h2 class="text-5xl font-bold text-white tracking-tight">A Controlled <span class="text-gradient">Production System</span></h2>
+                        <p class="mt-6 text-slate-400 max-w-2xl mx-auto text-xl">We replace chaos with workflow. Safe payments, structured briefs, and guaranteed delivery.</p>
+                    </div>
+
+                    <div class="grid md:grid-cols-3 gap-8">
+                        <!-- Step 1 -->
+                        <div class="group bg-white/5 backdrop-blur-sm p-10 rounded-3xl border border-white/5 hover:border-royal-500/50 hover:bg-white/10 transition-all duration-500 hover:-translate-y-4 hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)]">
+                            <div class="w-20 h-20 bg-gradient-to-br from-royal-900 to-indigo-900 rounded-2xl flex items-center justify-center mb-8 shadow-lg shadow-indigo-900/50 group-hover:scale-110 transition-transform duration-300 border border-white/10">
+                                <i class="fa-solid fa-layer-group text-3xl text-indigo-400"></i>
+                            </div>
+                            <div class="absolute top-8 right-8 text-7xl font-black text-white/5 -z-10 group-hover:text-white/10 transition-colors">01</div>
+                            <h3 class="text-2xl font-bold text-white mb-4 group-hover:text-brand-400 transition-colors">Select & Brief</h3>
+                            <p class="text-slate-400 text-base leading-relaxed">
+                                Browse creators based on content style, not followers. Submit a structured project brief. Pay 50% advance to escrow.
+                            </p>
+                        </div>
+                        <!-- Step 2 -->
+                        <div class="group bg-white/5 backdrop-blur-sm p-10 rounded-3xl border border-white/5 hover:border-royal-500/50 hover:bg-white/10 transition-all duration-500 hover:-translate-y-4 hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)] relative">
+                             <!-- Connector Line for Desktop -->
+                            <div class="hidden md:block absolute top-1/2 -left-6 w-8 h-1 bg-white/10 rounded-full"></div>
+
+                            <div class="w-20 h-20 bg-gradient-to-br from-royal-900 to-indigo-900 rounded-2xl flex items-center justify-center mb-8 shadow-lg shadow-indigo-900/50 group-hover:scale-110 transition-transform duration-300 border border-white/10">
+                                <i class="fa-solid fa-video text-3xl text-indigo-400"></i>
+                            </div>
+                            <div class="absolute top-8 right-8 text-7xl font-black text-white/5 -z-10 group-hover:text-white/10 transition-colors">02</div>
+                            <h3 class="text-2xl font-bold text-white mb-4 group-hover:text-brand-400 transition-colors">Production & Preview</h3>
+                            <p class="text-slate-400 text-base leading-relaxed">
+                                Creator produces the video. If physical product, address is revealed after payment. You get a watermarked preview.
+                            </p>
+                        </div>
+                        <!-- Step 3 -->
+                        <div class="group bg-white/5 backdrop-blur-sm p-10 rounded-3xl border border-white/5 hover:border-royal-500/50 hover:bg-white/10 transition-all duration-500 hover:-translate-y-4 hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)] relative">
+                             <!-- Connector Line for Desktop -->
+                             <div class="hidden md:block absolute top-1/2 -left-6 w-8 h-1 bg-white/10 rounded-full"></div>
+
+                            <div class="w-20 h-20 bg-gradient-to-br from-royal-900 to-indigo-900 rounded-2xl flex items-center justify-center mb-8 shadow-lg shadow-indigo-900/50 group-hover:scale-110 transition-transform duration-300 border border-white/10">
+                                <i class="fa-solid fa-check-double text-3xl text-indigo-400"></i>
+                            </div>
+                            <div class="absolute top-8 right-8 text-7xl font-black text-white/5 -z-10 group-hover:text-white/10 transition-colors">03</div>
+                            <h3 class="text-2xl font-bold text-white mb-4 group-hover:text-brand-400 transition-colors">Payment & Delivery</h3>
+                            <p class="text-slate-400 text-base leading-relaxed">
+                                Approve the preview. Pay the remaining 50%. The watermark is removed and the high-res file is yours immediately.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Value Props (No Influencers) -->
+            <div class="py-32 bg-slate-950 border-t border-white/5 relative">
+                <!-- Glowing orb -->
+                <div class="absolute left-0 top-1/2 w-[600px] h-[600px] bg-royal-800/20 rounded-full blur-[100px] -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+
+                <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center gap-20 relative z-10">
+                    <div class="md:w-1/2 order-2 md:order-1">
+                        <div class="group relative bg-white/5 backdrop-blur-xl rounded-[2.5rem] p-12 text-white shadow-2xl overflow-hidden border border-white/10 hover:border-royal-500/50 transition-all duration-500">
+                            <!-- Background Gradients -->
+                            <div class="absolute top-0 right-0 p-40 bg-royal-600 rounded-full blur-[80px] opacity-20 -mr-20 -mt-20 group-hover:opacity-30 transition-opacity"></div>
+                            <div class="absolute bottom-0 left-0 p-32 bg-indigo-600 rounded-full blur-[80px] opacity-20 -ml-16 -mb-16"></div>
+                            
+                            <h3 class="relative z-10 text-4xl font-bold mb-10">Not an Influencer Platform</h3>
+                            <ul class="relative z-10 space-y-6">
+                                <li class="flex items-center p-4 bg-slate-950/40 rounded-xl border border-white/5 backdrop-blur-sm">
+                                    <div class="w-10 h-10 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center mr-5 shrink-0 border border-red-500/20">
+                                        <i class="fa-solid fa-xmark"></i>
+                                    </div>
+                                    <span class="text-slate-200 font-medium text-lg">No paying for "Reach" or "Followers"</span>
+                                </li>
+                                <li class="flex items-center p-4 bg-slate-950/40 rounded-xl border border-white/5 backdrop-blur-sm">
+                                    <div class="w-10 h-10 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center mr-5 shrink-0 border border-red-500/20">
+                                        <i class="fa-solid fa-xmark"></i>
+                                    </div>
+                                    <span class="text-slate-200 font-medium text-lg">No unpredictable freelancer bidding</span>
+                                </li>
+                                <li class="flex items-center p-4 bg-royal-600/20 rounded-xl border border-royal-500/30 backdrop-blur-sm">
+                                    <div class="w-10 h-10 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center mr-5 shrink-0 border border-green-500/20">
+                                        <i class="fa-solid fa-check"></i>
+                                    </div>
+                                    <span class="text-white font-medium text-lg">Fixed pricing based on video quality</span>
+                                </li>
+                                <li class="flex items-center p-4 bg-royal-600/20 rounded-xl border border-royal-500/30 backdrop-blur-sm">
+                                    <div class="w-10 h-10 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center mr-5 shrink-0 border border-green-500/20">
+                                        <i class="fa-solid fa-check"></i>
+                                    </div>
+                                    <span class="text-white font-medium text-lg">Platform handles contracts & rights</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="md:w-1/2 order-1 md:order-2">
+                        <span class="text-brand-400 font-bold tracking-wider uppercase text-sm mb-4 block">Why MediaMatrix?</span>
+                        <h2 class="text-5xl font-bold text-white mb-8 leading-tight">Scale Your Content,<br>Not Your Headaches.</h2>
+                        <p class="text-slate-400 mb-12 text-xl leading-relaxed font-light">
+                            Startups need assets for ads and social media, not shoutouts. Creators need consistent work, not just likes. We bridge the gap with a professional SaaS interface that puts workflow first.
+                        </p>
+                        <div class="grid grid-cols-2 gap-8">
+                            <div class="p-8 bg-white/5 rounded-2xl border border-white/10 hover:bg-white/10 transition-colors">
+                                <div class="text-5xl font-black text-brand-400 mb-2">₹1.5k</div>
+                                <div class="text-base font-semibold text-white">Starting price</div>
+                                <div class="text-sm text-slate-500 mt-2">per approved video</div>
+                            </div>
+                            <div class="p-8 bg-white/5 rounded-2xl border border-white/10 hover:bg-white/10 transition-colors">
+                                <div class="text-5xl font-black text-brand-400 mb-2">48h</div>
+                                <div class="text-base font-semibold text-white">Avg. Turnaround</div>
+                                <div class="text-sm text-slate-500 mt-2">from product receipt</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Removed Pricing Section as per request -->
+
+            <!-- Trust Section -->
+            <div class="bg-slate-950 border-t border-white/5 py-32">
+                <div class="max-w-7xl mx-auto px-4">
+                    <div class="text-center mb-16">
+                        <h2 class="text-3xl font-bold text-white">Built on Trust & Safety</h2>
+                        <p class="mt-4 text-slate-400">We take care of the details so you can focus on the content.</p>
+                    </div>
+                    <div class="grid md:grid-cols-3 gap-8">
+                        <div class="flex flex-col items-center text-center p-8 bg-white/5 rounded-2xl border border-white/5 hover:bg-white/10 transition-colors">
+                            <div class="w-16 h-16 rounded-full bg-brand-500/20 text-brand-400 flex items-center justify-center mb-6">
+                                <i class="fa-solid fa-shield-halved text-2xl"></i>
+                            </div>
+                            <h4 class="font-bold text-white mb-2 text-xl">Escrow Payments</h4>
+                            <p class="text-sm text-slate-400 leading-relaxed">Funds are held safely until the preview is approved. Creators are guaranteed payment upon delivery.</p>
+                        </div>
+                        <div class="flex flex-col items-center text-center p-8 bg-white/5 rounded-2xl border border-white/5 hover:bg-white/10 transition-colors">
+                            <div class="w-16 h-16 rounded-full bg-brand-500/20 text-brand-400 flex items-center justify-center mb-6">
+                                <i class="fa-solid fa-user-check text-2xl"></i>
+                            </div>
+                            <h4 class="font-bold text-white mb-2 text-xl">Verified Creators</h4>
+                            <p class="text-sm text-slate-400 leading-relaxed">Every creator is manually vetted for quality. No bots, no fake portfolios. Real humans only.</p>
+                        </div>
+                        <div class="flex flex-col items-center text-center p-8 bg-white/5 rounded-2xl border border-white/5 hover:bg-white/10 transition-colors">
+                            <div class="w-16 h-16 rounded-full bg-brand-500/20 text-brand-400 flex items-center justify-center mb-6">
+                                <i class="fa-solid fa-file-contract text-2xl"></i>
+                            </div>
+                            <h4 class="font-bold text-white mb-2 text-xl">Copyright Protection</h4>
+                            <p class="text-sm text-slate-400 leading-relaxed">Startups get 100% usage rights. Contracts are generated automatically per project.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ======================= 
+             AUTH / ROLE SELECTION 
+             ======================= -->
+        <section id="page-auth" class="page-section hide min-h-screen flex items-center justify-center bg-slate-50 relative overflow-hidden">
+            <!-- Auth Background -->
+            <div class="absolute inset-0 bg-navy-900">
+                 <div class="absolute top-0 right-0 p-96 bg-brand-600 rounded-full blur-3xl opacity-10 -mr-20 -mt-20"></div>
+                 <div class="absolute bottom-0 left-0 p-64 bg-purple-600 rounded-full blur-3xl opacity-10 -ml-16 -mb-16"></div>
+            </div>
+
+            <div class="w-full max-w-md bg-white p-8 rounded-2xl shadow-2xl border border-white/10 relative z-10 animate-slide-up">
+                <div class="text-center mb-10">
+                    <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-navy-900 to-brand-600 text-white font-bold mb-4 shadow-lg">MM</div>
+                    <h2 class="text-2xl font-bold text-navy-900">Welcome Back</h2>
+                    <p class="text-slate-500 text-sm mt-2">Select your workspace to continue</p>
+                </div>
+                
+                <div class="space-y-4 mb-8">
+                    <button onclick="app.setAuthRole('startup')" id="btn-role-startup" class="w-full p-4 border-2 border-slate-100 rounded-xl flex items-center hover:border-brand-500 hover:bg-blue-50/50 transition-all duration-300 group hover:shadow-lg">
+                        <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center group-hover:bg-brand-600 group-hover:text-white transition-colors duration-300">
+                            <i class="fa-solid fa-building text-lg"></i>
+                        </div>
+                        <div class="ml-4 text-left">
+                            <div class="font-bold text-navy-900 group-hover:text-brand-600 transition-colors">I am a Startup</div>
+                            <div class="text-xs text-slate-500">I want to buy UGC videos</div>
+                        </div>
+                        <div class="ml-auto opacity-0 group-hover:opacity-100 transition-opacity -translate-x-2 group-hover:translate-x-0">
+                            <i class="fa-solid fa-arrow-right text-brand-600"></i>
+                        </div>
+                    </button>
+
+                    <button onclick="app.setAuthRole('creator')" id="btn-role-creator" class="w-full p-4 border-2 border-slate-100 rounded-xl flex items-center hover:border-brand-500 hover:bg-blue-50/50 transition-all duration-300 group hover:shadow-lg">
+                        <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center group-hover:bg-brand-600 group-hover:text-white transition-colors duration-300">
+                            <i class="fa-solid fa-video text-lg"></i>
+                        </div>
+                        <div class="ml-4 text-left">
+                            <div class="font-bold text-navy-900 group-hover:text-brand-600 transition-colors">I am a Creator</div>
+                            <div class="text-xs text-slate-500">I want to create content & earn</div>
+                        </div>
+                        <div class="ml-auto opacity-0 group-hover:opacity-100 transition-opacity -translate-x-2 group-hover:translate-x-0">
+                             <i class="fa-solid fa-arrow-right text-brand-600"></i>
+                        </div>
+                    </button>
+                </div>
+
+                <button onclick="app.login()" class="w-full bg-navy-900 text-white py-4 rounded-xl font-bold hover:bg-brand-600 transition-all shadow-lg hover:shadow-brand-600/30 hover:-translate-y-0.5">
+                    Enter Dashboard
+                </button>
+                
+                <div class="mt-8 pt-6 border-t border-slate-100 text-center">
+                    <p class="text-xs text-slate-400">
+                        By entering, you agree to our <a href="#" class="underline hover:text-brand-600">SaaS Terms</a>. <br>
+                        Secure Escrow Payments • Verified Identity
+                    </p>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ======================= 
+             STARTUP DASHBOARD 
+             ======================= -->
+        <section id="page-startup-dash" class="page-section hide bg-slate-50 min-h-screen pb-20 relative">
+            <div class="absolute top-0 left-0 w-full h-64 bg-navy-900 -z-0"></div>
+            
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
+                
+                <!-- Dashboard Header -->
+                <div class="flex justify-between items-end mb-8 text-white">
+                    <div class="animate-slide-up">
+                        <h1 class="text-3xl font-bold text-white">Startup Dashboard</h1>
+                        <p class="text-slate-300 text-sm mt-1">Manage projects and find creators</p>
+                    </div>
+                    <div class="flex space-x-3 animate-slide-up" style="animation-delay: 0.1s;">
+                        <button onclick="app.switchTab('startup', 'market')" id="tab-market" class="px-5 py-2.5 bg-white text-brand-600 rounded-lg text-sm font-bold shadow-lg hover:bg-blue-50 transition-colors">Browse Creators</button>
+                        <button onclick="app.switchTab('startup', 'projects')" id="tab-projects" class="px-5 py-2.5 bg-navy-800 border border-navy-700 text-slate-300 rounded-lg text-sm font-bold hover:bg-navy-700 hover:text-white transition-colors">My Projects</button>
+                    </div>
+                </div>
+
+                <!-- VIEW: Marketplace -->
+                <div id="view-startup-market" class="block animate-slide-up" style="animation-delay: 0.2s;">
+                    <!-- Filters -->
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 mb-8 flex gap-6 items-center shadow-sm">
+                        <span class="text-xs font-bold uppercase text-slate-400 tracking-wider"><i class="fa-solid fa-filter mr-2"></i>Filter By:</span>
+                        <select class="text-sm border-slate-200 border rounded-lg px-3 py-2 bg-slate-50 focus:ring-brand-500 focus:border-brand-500 outline-none hover:border-brand-300 transition-colors">
+                            <option>All Styles</option>
+                            <option>Aesthetic/Minimal</option>
+                            <option>Energetic/TikTok</option>
+                            <option>Professional/Corporate</option>
+                        </select>
+                        <select class="text-sm border-slate-200 border rounded-lg px-3 py-2 bg-slate-50 focus:ring-brand-500 focus:border-brand-500 outline-none hover:border-brand-300 transition-colors">
+                            <option>Price: Low to High</option>
+                            <option>Price: High to Low</option>
+                        </select>
+                    </div>
+
+                    <!-- Creator Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-20" id="creator-grid">
+                        <!-- Content populated by JS -->
+                    </div>
+                    <!-- Note for demo -->
+                     <div class="text-center text-slate-400 text-sm italic">
+                         Showing simulated creator results for demo purposes.
+                     </div>
+                </div>
+
+                <!-- VIEW: Projects -->
+                <div id="view-startup-projects" class="hidden">
+                    <div class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+                        <table class="min-w-full divide-y divide-slate-200">
+                            <thead class="bg-slate-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Project ID</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Creator</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Payment</th>
+                                    <th class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-slate-200" id="startup-project-list">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                        <div id="no-projects-msg" class="text-center py-10 hidden">
+                            <p class="text-slate-500">No active projects. Hire a creator to get started.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ======================= 
+             CREATOR DASHBOARD 
+             ======================= -->
+        <section id="page-creator-dash" class="page-section hide bg-slate-50 min-h-screen pb-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                
+                <div class="flex justify-between items-end mb-8">
+                    <div>
+                        <h1 class="text-2xl font-bold text-navy-900">Creator Workspace</h1>
+                        <p class="text-slate-500 text-sm">Manage jobs and earnings</p>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="text-slate-500 text-xs uppercase font-bold tracking-wider">Total Earnings</div>
+                        <div class="text-2xl font-bold text-navy-900 mt-2">₹<span id="stat-earnings">0</span></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="text-slate-500 text-xs uppercase font-bold tracking-wider">Active Jobs</div>
+                        <div class="text-2xl font-bold text-navy-900 mt-2" id="stat-active">0</div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="text-slate-500 text-xs uppercase font-bold tracking-wider">Rating</div>
+                        <div class="text-2xl font-bold text-navy-900 mt-2">4.9 <span class="text-yellow-400 text-lg"><i class="fa-solid fa-star"></i></span></div>
+                    </div>
+                </div>
+
+                <!-- Job Board -->
+                <h3 class="text-lg font-bold text-navy-900 mb-4">Your Jobs</h3>
+                <div class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+                    <table class="min-w-full divide-y divide-slate-200">
+                        <thead class="bg-slate-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Project</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Startup</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Type</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Stage</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-slate-200" id="creator-job-list">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ======================= 
+             MODALS & OVERLAYS 
+             ======================= -->
+
+        <!-- Checkout / Brief Modal -->
+        <div id="modal-brief" class="hide fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+            <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                <div class="fixed inset-0 bg-navy-900/80 backdrop-blur-sm transition-opacity" aria-hidden="true" onclick="app.closeModal('modal-brief')"></div>
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full border border-white/20">
+                    <div class="bg-white px-6 pt-8 pb-6 sm:p-8">
+                        <div class="sm:flex sm:items-start">
+                            <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                                <div class="flex justify-between items-center mb-6">
+                                    <h3 class="text-2xl leading-6 font-bold text-navy-900" id="modal-title">Project Brief</h3>
+                                    <div class="text-sm text-slate-500 bg-slate-100 px-3 py-1 rounded-full border border-slate-200">Hiring <span id="brief-creator-name" class="font-bold text-navy-900"></span></div>
+                                </div>
+                                
+                                <form id="brief-form" onsubmit="event.preventDefault(); app.submitBrief()">
+                                    <div class="space-y-5">
+                                        <div>
+                                            <label class="block text-sm font-bold text-slate-700 mb-1">Product/Service Name</label>
+                                            <input type="text" id="brief-product" required class="block w-full border border-slate-300 rounded-lg py-2.5 px-3 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 sm:text-sm transition-shadow">
+                                        </div>
+                                        
+                                        <div class="grid grid-cols-2 gap-5">
+                                            <div>
+                                                <label class="block text-sm font-bold text-slate-700 mb-1">Type</label>
+                                                <select id="brief-type" class="block w-full border border-slate-300 rounded-lg py-2.5 px-3 bg-white focus:ring-2 focus:ring-brand-500 sm:text-sm">
+                                                    <option>Digital Product</option>
+                                                    <option>Physical Product (Requires Shipping)</option>
+                                                    <option>Service</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label class="block text-sm font-bold text-slate-700 mb-1">Usage</label>
+                                                <select class="block w-full border border-slate-300 rounded-lg py-2.5 px-3 bg-white focus:ring-2 focus:ring-brand-500 sm:text-sm">
+                                                    <option>Social Media Ads</option>
+                                                    <option>Organic Social</option>
+                                                    <option>Website/Landing Page</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-sm font-bold text-slate-700 mb-1">Script / Concept / Notes</label>
+                                            <textarea rows="3" required class="block w-full border border-slate-300 rounded-lg py-2.5 px-3 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 sm:text-sm transition-shadow" placeholder="Describe what you want..."></textarea>
+                                        </div>
+
+                                        <div class="bg-blue-50 p-5 rounded-xl border border-blue-100 mt-4">
+                                            <h4 class="text-xs font-bold text-brand-700 uppercase mb-3 tracking-wider">Payment Summary (Escrow)</h4>
+                                            <div class="flex justify-between text-sm text-slate-700 mb-2">
+                                                <span>Total Project Cost</span>
+                                                <span class="font-bold">₹<span id="brief-total"></span></span>
+                                            </div>
+                                            <div class="flex justify-between items-center text-sm text-navy-900 pt-2 border-t border-blue-200">
+                                                <span class="font-medium">Advance Due Now (50%)</span>
+                                                <span class="font-bold text-xl text-brand-600">₹<span id="brief-advance"></span></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mt-8 sm:mt-8 sm:grid sm:grid-cols-2 sm:gap-4 sm:grid-flow-row-dense">
+                                        <button type="submit" class="w-full inline-flex justify-center items-center rounded-xl border border-transparent shadow-lg shadow-brand-500/30 px-4 py-3 bg-brand-600 text-base font-bold text-white hover:bg-brand-500 focus:outline-none sm:col-start-2 sm:text-sm transition-all hover:-translate-y-0.5">
+                                            <i class="fa-solid fa-lock mr-2 text-brand-200"></i> Pay Advance & Start
+                                        </button>
+                                        <button type="button" onclick="app.closeModal('modal-brief')" class="mt-3 w-full inline-flex justify-center rounded-xl border border-slate-300 shadow-sm px-4 py-3 bg-white text-base font-bold text-slate-700 hover:bg-slate-50 focus:outline-none sm:mt-0 sm:col-start-1 sm:text-sm hover:text-navy-900">
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Project Detail Modal (Shared for viewing status) -->
+        <div id="modal-project" class="hide fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div class="fixed inset-0 bg-navy-900 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="app.closeModal('modal-project')"></div>
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6">
+                        <div class="flex justify-between mb-4 border-b border-slate-200 pb-2">
+                            <h3 class="text-lg font-bold text-navy-900" id="project-detail-title">Project Details</h3>
+                            <span id="project-detail-status" class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">In Progress</span>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <!-- Details -->
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                <div><span class="font-semibold">Product:</span> <span id="pd-product"></span></div>
+                                <div><span class="font-semibold">Type:</span> <span id="pd-type"></span></div>
+                            </div>
+                            
+                            <!-- Workflow Steps Container -->
+                            <div id="workflow-container" class="mt-6 bg-slate-50 p-4 rounded-lg border border-slate-200">
+                                <!-- Dynamic content based on status and role -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                        <button type="button" onclick="app.closeModal('modal-project')" class="mt-3 w-full inline-flex justify-center rounded-md border border-slate-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-slate-700 hover:bg-slate-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="bg-slate-950 border-t border-white/10 mt-0">
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 md:flex md:items-center md:justify-between lg:px-8">
+            <div class="flex justify-center space-x-8 md:order-2">
+                <a href="#" class="text-slate-500 hover:text-brand-400 transition-colors transform hover:scale-110"><i class="fa-brands fa-instagram fa-lg"></i></a>
+                <a href="#" class="text-slate-500 hover:text-brand-400 transition-colors transform hover:scale-110"><i class="fa-brands fa-linkedin fa-lg"></i></a>
+                <a href="#" class="text-slate-500 hover:text-brand-400 transition-colors transform hover:scale-110"><i class="fa-brands fa-twitter fa-lg"></i></a>
+            </div>
+            <div class="mt-8 md:mt-0 md:order-1">
+                <p class="text-center text-base text-slate-600">&copy; 2023 MediaMatrix. India-First SaaS for UGC.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- LOGIC -->
+    <script>
+        const app = {
+            state: {
+                page: 'home',
+                userRole: null, // 'startup' or 'creator'
+                isLoggedIn: false,
+                currentProject: null,
+                projects: [],
+                creators: [
+                    { id: 1, name: "Aarav P.", style: "Tech & Apps", price: 1500, rating: 4.8, img: "bg-blue-200" },
+                    { id: 2, name: "Diya S.", style: "Beauty & Skin", price: 1200, rating: 4.9, img: "bg-pink-200" },
+                    { id: 3, name: "Rohan M.", style: "Finance/SaaS", price: 1500, rating: 5.0, img: "bg-green-200" },
+                    { id: 4, name: "Zara K.", style: "Lifestyle", price: 1000, rating: 4.7, img: "bg-yellow-200" },
+                    { id: 5, name: "Vikram R.", style: "Fitness", price: 1200, rating: 4.8, img: "bg-red-200" },
+                    { id: 6, name: "Naina T.", style: "Unboxing", price: 1000, rating: 4.6, img: "bg-purple-200" },
+                ],
+                earnings: 0
+            },
+
+            init: function() {
+                this.render();
+            },
+
+            // Navigation Router
+            router: function(pageName) {
+                this.state.page = pageName;
+                window.scrollTo(0,0);
+                this.render();
+            },
+
+            // Role selection from Home
+            preSelectRole: function(role) {
+                this.setAuthRole(role);
+                this.router('login');
+            },
+
+            // Set Role in Auth Screen
+            setAuthRole: function(role) {
+                this.state.userRole = role;
+                
+                // Visual toggle
+                const startBtn = document.getElementById('btn-role-startup');
+                const creatBtn = document.getElementById('btn-role-creator');
+                
+                startBtn.classList.remove('border-brand-500', 'bg-brand-50');
+                creatBtn.classList.remove('border-brand-500', 'bg-brand-50');
+                
+                if (role === 'startup') {
+                    startBtn.classList.add('border-brand-500', 'bg-brand-50');
+                } else {
+                    creatBtn.classList.add('border-brand-500', 'bg-brand-50');
+                }
+            },
+
+            // Simulate Login
+            login: function() {
+                if (!this.state.userRole) {
+                    alert("Please select a role first.");
+                    return;
+                }
+                this.state.isLoggedIn = true;
+                this.router(this.state.userRole === 'startup' ? 'startup-dash' : 'creator-dash');
+            },
+
+            logout: function() {
+                this.state.isLoggedIn = false;
+                this.state.userRole = null;
+                this.router('home');
+            },
+
+            // UI Renderer
+            render: function() {
+                // Hide all sections
+                document.querySelectorAll('.page-section').forEach(el => el.classList.add('hide'));
+
+                // Navigation Logic
+                const publicNav = document.getElementById('public-nav');
+                const appNav = document.getElementById('app-nav');
+                
+                if (this.state.isLoggedIn) {
+                    publicNav.classList.add('hidden');
+                    appNav.classList.remove('hidden');
+                    document.getElementById('user-display').innerText = 
+                        this.state.userRole === 'startup' ? 'Startup Workspace' : 'Creator Workspace';
+                } else {
+                    publicNav.classList.remove('hidden');
+                    appNav.classList.add('hidden');
+                }
+
+                // Page Switching
+                if (this.state.page === 'home') {
+                    document.getElementById('page-home').classList.remove('hide');
+                } else if (this.state.page === 'login' || this.state.page === 'signup') {
+                    document.getElementById('page-auth').classList.remove('hide');
+                } else if (this.state.page === 'startup-dash') {
+                    document.getElementById('page-startup-dash').classList.remove('hide');
+                    this.renderMarketplace();
+                    this.renderStartupProjects();
+                } else if (this.state.page === 'creator-dash') {
+                    document.getElementById('page-creator-dash').classList.remove('hide');
+                    this.renderCreatorJobs();
+                }
+            },
+
+            // --- STARTUP FUNCTIONS ---
+
+            switchTab: function(role, tab) {
+                if (role === 'startup') {
+                    document.getElementById('view-startup-market').classList.add('hidden');
+                    document.getElementById('view-startup-projects').classList.add('hidden');
+                    document.getElementById('tab-market').classList.replace('text-brand-600', 'text-slate-600');
+                    document.getElementById('tab-projects').classList.replace('text-brand-600', 'text-slate-600');
+                    
+                    document.getElementById(`view-startup-${tab}`).classList.remove('hidden');
+                    document.getElementById(`tab-${tab}`).classList.replace('text-slate-600', 'text-brand-600');
+                    
+                    if(tab === 'projects') this.renderStartupProjects();
+                }
+            },
+
+            renderMarketplace: function() {
+                const grid = document.getElementById('creator-grid');
+                grid.innerHTML = this.state.creators.map(c => `
+                    <div class="group bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-xl hover:border-brand-200 transition-all duration-300 hover:-translate-y-1">
+                        <div class="h-40 ${c.img} w-full flex items-center justify-center text-slate-500 relative overflow-hidden">
+                             <div class="absolute inset-0 bg-black/5 group-hover:bg-black/0 transition-colors"></div>
+                            <i class="fa-solid fa-play-circle text-5xl text-white/80 group-hover:scale-110 transition-transform duration-300 drop-shadow-lg"></i>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <h3 class="font-bold text-lg text-navy-900">${c.name}</h3>
+                                    <span class="text-xs font-semibold tracking-wide text-brand-600 bg-blue-50 px-2 py-1 rounded-md mt-1 inline-block border border-blue-100">${c.style}</span>
+                                </div>
+                                <div class="flex items-center text-sm font-bold bg-yellow-50 text-yellow-700 px-2 py-1 rounded border border-yellow-100">
+                                    <i class="fa-solid fa-star text-yellow-400 mr-1.5"></i> ${c.rating}
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-end border-t border-slate-100 pt-4">
+                                <div>
+                                    <span class="text-xs text-slate-400 uppercase font-bold">Standard Rate</span>
+                                    <div class="font-extrabold text-xl text-navy-900">₹${c.price}</div>
+                                </div>
+                                <button onclick="app.openBriefModal(${c.id})" class="bg-navy-900 text-white text-sm px-5 py-2.5 rounded-lg font-bold hover:bg-brand-600 transition-colors shadow-md hover:shadow-lg">
+                                    Hire Now
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            },
+
+            openBriefModal: function(creatorId) {
+                const creator = this.state.creators.find(c => c.id === creatorId);
+                this.state.tempCreator = creator; // Store for submission
+                
+                document.getElementById('brief-creator-name').innerText = creator.name;
+                document.getElementById('brief-price').innerText = creator.price;
+                document.getElementById('brief-total').innerText = creator.price;
+                document.getElementById('brief-advance').innerText = creator.price / 2;
+                
+                document.getElementById('brief-form').reset();
+                this.openModal('modal-brief');
+            },
+
+            submitBrief: function() {
+                const product = document.getElementById('brief-product').value;
+                const type = document.getElementById('brief-type').value;
+                const price = this.state.tempCreator.price;
+                
+                const newProject = {
+                    id: Math.floor(Math.random() * 10000),
+                    creatorName: this.state.tempCreator.name,
+                    creatorId: this.state.tempCreator.id,
+                    product: product,
+                    type: type,
+                    price: price,
+                    status: 'brief_submitted', // brief_submitted, in_progress, preview_ready, completed
+                    advancePaid: true,
+                    finalPaid: false
+                };
+
+                this.state.projects.push(newProject);
+                this.closeModal('modal-brief');
+                this.switchTab('startup', 'projects'); // Switch to projects view
+                alert("Brief Submitted & Advance Payment (Simulated) Successful!");
+            },
+
+            renderStartupProjects: function() {
+                const list = document.getElementById('startup-project-list');
+                const emptyMsg = document.getElementById('no-projects-msg');
+                
+                if (this.state.projects.length === 0) {
+                    list.innerHTML = '';
+                    emptyMsg.classList.remove('hidden');
+                    return;
+                }
+
+                emptyMsg.classList.add('hidden');
+                list.innerHTML = this.state.projects.map(p => `
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">#${p.id}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-navy-900">${p.creatorName}</div>
+                            <div class="text-xs text-slate-500">${p.product}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                ${p.status === 'completed' ? 'bg-green-100 text-green-800' : 
+                                  p.status === 'preview_ready' ? 'bg-purple-100 text-purple-800' : 
+                                  'bg-yellow-100 text-yellow-800'}">
+                                ${p.status.replace('_', ' ')}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
+                            ${p.finalPaid ? 'Full Paid' : '50% Paid'}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button onclick="app.viewProject(${p.id})" class="text-brand-600 hover:text-brand-900">View</button>
+                        </td>
+                    </tr>
+                `).join('');
+            },
+
+            // --- CREATOR FUNCTIONS ---
+
+            renderCreatorJobs: function() {
+                const list = document.getElementById('creator-job-list');
+                const projects = this.state.projects; // In real app, filter by creator ID
+                
+                // Stats update
+                document.getElementById('stat-active').innerText = projects.filter(p => p.status !== 'completed').length;
+                document.getElementById('stat-earnings').innerText = this.state.earnings;
+
+                if (projects.length === 0) {
+                    list.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-slate-500">No active jobs yet.</td></tr>';
+                    return;
+                }
+
+                list.innerHTML = projects.map(p => `
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-navy-900">#${p.id}</div>
+                            <div class="text-xs text-slate-500">${p.product}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">Startup Inc.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">${p.type}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                ${p.status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}">
+                                ${p.status.replace('_', ' ')}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button onclick="app.viewProject(${p.id})" class="text-brand-600 hover:text-brand-900">Manage</button>
+                        </td>
+                    </tr>
+                `).join('');
+            },
+
+            // --- SHARED PROJECT WORKFLOW ---
+
+            viewProject: function(id) {
+                const p = this.state.projects.find(proj => proj.id === id);
+                if (!p) return;
+                this.state.currentProject = p;
+
+                document.getElementById('project-detail-title').innerText = `Project #${p.id}`;
+                document.getElementById('pd-product').innerText = p.product;
+                document.getElementById('pd-type').innerText = p.type;
+                
+                const container = document.getElementById('workflow-container');
+                container.innerHTML = ''; // Clear
+
+                // WORKFLOW LOGIC RENDERING
+                const role = this.state.userRole;
+                const isPhysical = p.type.includes('Physical');
+                
+                if (p.status === 'brief_submitted') {
+                    if (role === 'creator') {
+                        // If physical, go to shipping pending, else in progress
+                        const nextStatus = isPhysical ? 'shipping_pending' : 'in_progress';
+                        const btnText = isPhysical ? 'Accept & Reveal Address' : 'Accept & Start';
+                        
+                        container.innerHTML = `
+                            <div class="text-center py-4">
+                                <i class="fa-solid fa-box-open text-3xl text-slate-300 mb-2"></i>
+                                <p class="mb-4 text-sm">New project request!</p>
+                                <button onclick="app.updateStatus(${p.id}, '${nextStatus}')" class="bg-brand-600 text-white px-4 py-2 rounded shadow-sm hover:bg-brand-700">${btnText}</button>
+                            </div>
+                        `;
+                    } else {
+                        container.innerHTML = `<p class="text-sm text-slate-500 text-center">Waiting for creator to accept.</p>`;
+                    }
+                } 
+                else if (p.status === 'shipping_pending') {
+                    if (role === 'startup') {
+                        container.innerHTML = `
+                            <div class="bg-blue-50 border border-blue-200 p-4 rounded-lg">
+                                <h4 class="font-bold text-blue-900 mb-2"><i class="fa-solid fa-truck-fast mr-2"></i>Ship Product</h4>
+                                <p class="text-sm text-blue-800 mb-2">Please ship your product to:</p>
+                                <div class="bg-white p-3 rounded border border-blue-100 text-sm font-mono text-slate-600 mb-3">
+                                    Creator Studios, Bldg 4,<br>Tech Park, Mumbai, 400001
+                                </div>
+                                <p class="text-xs text-blue-600">The creator will start work once they receive it.</p>
+                            </div>
+                        `;
+                    } else {
+                        container.innerHTML = `
+                            <div class="text-center py-4">
+                                <p class="text-sm text-slate-600 mb-4">Waiting for product delivery.</p>
+                                <button onclick="app.updateStatus(${p.id}, 'in_progress')" class="bg-navy-900 text-white px-4 py-2 rounded text-sm hover:bg-navy-800">
+                                    <i class="fa-solid fa-check mr-2"></i>Confirm Product Received
+                                </button>
+                            </div>
+                        `;
+                    }
+                }
+                else if (p.status === 'in_progress') {
+                    if (role === 'creator') {
+                        container.innerHTML = `
+                             <div class="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center">
+                                <p class="mb-4 font-bold text-navy-900">Production In Progress</p>
+                                <p class="text-xs text-slate-500 mb-4">Upload preview when ready.</p>
+                                <button onclick="app.updateStatus(${p.id}, 'preview_ready')" class="bg-navy-900 text-white px-4 py-2 rounded text-sm hover:bg-navy-800">
+                                    <i class="fa-solid fa-cloud-arrow-up mr-2"></i>Upload Preview
+                                </button>
+                            </div>
+                        `;
+                    } else {
+                         container.innerHTML = `<p class="text-sm text-slate-500 text-center">Creator is producing your video.</p>`;
+                    }
+                } else if (p.status === 'preview_ready') {
+                     // SHOW PREVIEW
+                     const previewHTML = `
+                        <div class="bg-black rounded-lg aspect-video w-full flex items-center justify-center mb-4 watermarked">
+                            <i class="fa-solid fa-play text-white text-4xl"></i>
+                        </div>
+                     `;
+
+                     if (role === 'startup') {
+                         container.innerHTML = `
+                            ${previewHTML}
+                            <div class="bg-yellow-50 border border-yellow-200 p-3 rounded mb-4">
+                                <p class="text-xs text-yellow-800">Preview is watermarked. Approve and pay balance to download final.</p>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div class="text-sm font-bold">Balance Due: ₹${p.price / 2}</div>
+                                <button onclick="app.payBalance(${p.id})" class="bg-green-600 text-white px-4 py-2 rounded shadow-md hover:bg-green-700">Approve & Pay</button>
+                            </div>
+                         `;
+                     } else {
+                         container.innerHTML = `
+                            ${previewHTML}
+                            <p class="text-sm text-slate-500 text-center">Waiting for startup approval & final payment.</p>
+                         `;
+                     }
+                } else if (p.status === 'completed') {
+                    container.innerHTML = `
+                        <div class="bg-green-50 border border-green-200 p-4 rounded text-center">
+                            <i class="fa-solid fa-circle-check text-green-600 text-2xl mb-2"></i>
+                            <h4 class="font-bold text-green-900">Project Completed</h4>
+                            <p class="text-xs text-green-700 mb-4">Full payment received.</p>
+                            <button class="bg-white border border-slate-300 text-slate-700 px-4 py-2 rounded shadow-sm text-sm">
+                                <i class="fa-solid fa-download mr-2"></i>Download Final Video
+                            </button>
+                        </div>
+                    `;
+                }
+
+                this.openModal('modal-project');
+            },
+
+            updateStatus: function(id, status) {
+                const project = this.state.projects.find(p => p.id === id);
+                if (project) {
+                    project.status = status;
+                    this.viewProject(id); // Re-render modal
+                    this.renderCreatorJobs(); // Re-render list
+                    this.renderStartupProjects();
+                }
+            },
+
+            payBalance: function(id) {
+                const project = this.state.projects.find(p => p.id === id);
+                if (project) {
+                    // Logic: Startup pays remaining 50%
+                    // Platform takes commission (e.g. 20% of total) -> Creator gets 80% of total
+                    // This is simulated here.
+                    
+                    project.finalPaid = true;
+                    project.status = 'completed';
+                    
+                    // Update creator earnings
+                    // Simple Calc: Total Price - 20% Platform Fee
+                    const payout = project.price * 0.8;
+                    this.state.earnings += payout; 
+
+                    this.viewProject(id);
+                    this.renderStartupProjects();
+                    alert("Payment Successful! Final video unlocked.");
+                }
+            },
+
+            // Utils
+            openModal: function(id) { document.getElementById(id).classList.remove('hide'); },
+            closeModal: function(id) { document.getElementById(id).classList.add('hide'); }
+        };
+
+        // Initialize App
+        window.onload = function() {
+            app.init();
+        };
+    </script>
+</body>
+</html>
